@@ -50,4 +50,23 @@ class Post extends Model
     {
         return $this->hasMany(Like::class);
     }
+
+    /**
+     * Verifica se o post foi curtido por um determinado usuário.
+     */
+    public function isLikedBy(?User $user): bool
+    {
+        if (!$user) return false;
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Retorna contagem de likes (usa coluna cache se existente, senão count()).
+     */
+    public function likesCount(): int
+    {
+        return isset($this->attributes['likes_count'])
+            ? (int) $this->attributes['likes_count']
+            : $this->likes()->count();
+    }
 }

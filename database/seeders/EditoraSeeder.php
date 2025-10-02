@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Editora;
 
 class EditoraSeeder extends Seeder
 {
@@ -12,6 +13,16 @@ class EditoraSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $editoras = [
+            ['nome' => 'Editora Companhia das Letras'],
+            ['nome' => 'Editora Record'],
+            ['nome' => 'Editora Globo Livros'],
+            ['nome' => 'Editora Intrínseca'],
+            ['nome' => 'Editora Suma de Letras']
+        ];
+
+        foreach ($editoras as $editora) {
+            Editora::create($editora);
+        }
     }
 }

@@ -28,5 +28,19 @@ class UserTableSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
 
+        // Usuário Felipe
+        User::create([
+            'name' => 'felipe',
+            'image_profile' => 'default-user.png',
+            'description_profile' => 'Usuário teste',
+            'address' => "São Paulo",
+            'whatsapp' => "11999999999",
+            'instagram' => "@felipe",
+            'email' => 'felipe@felipe',
+            'email_verified_at' => now(),
+            'password' => bcrypt('felipe123'),
+            'remember_token' => Str::random(10),
+        ]);
+
     }
 }

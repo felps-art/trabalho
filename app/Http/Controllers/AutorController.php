@@ -2,63 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Autor;
+use App\Http\Requests\AutorRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AutorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista autores com contagem de livros associados.
      */
-    public function index()
+    public function index(): View
     {
-        //
+        $autores = Autor::withCount('livros')
+            ->orderBy('nome')
+            ->paginate(20);
+        return view('autores.index', compact('autores'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Formulário de criação.
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('autores.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Persistir novo autor.
      */
-    public function store(Request $request)
+    public function store(AutorRequest $request): RedirectResponse
     {
-        //
+        $autor = Autor::create($request->validated());
+        return redirect()->route('autores.show', $autor->id)
+            ->with('success', 'Autor criado com sucesso!');
     }
 
     /**
-     * Display the specified resource.
+     * Exibir autor.
      */
-    public function show(string $id)
+    public function show(int $id): View
     {
-        //
+        $autor = Autor::with('livros')->findOrFail($id);
+        return view('autores.show', compact('autor'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Formulário de edição.
      */
-    public function edit(string $id)
+    public function edit(int $id): View
     {
-        //
+        $autor = Autor::findOrFail($id);
+        return view('autores.edit', compact('autor'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualizar autor.
      */
-    public function update(Request $request, string $id)
+    public function update(AutorRequest $request, int $id): RedirectResponse
     {
-        //
+        $autor = Autor::findOrFail($id);
+        $autor->update($request->validated());
+        return redirect()->route('autores.show', $autor->id)
+            ->with('success', 'Autor atualizado com sucesso!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Excluir autor.
      */
-    public function destroy(string $id)
+    public function destroy(int $id): RedirectResponse
     {
-        //
+        $autor = Autor::findOrFail($id);
+        $autor->delete();
+        return redirect()->route('autores.index')
+            ->with('success', 'Autor excluído com sucesso!');
     }
 }

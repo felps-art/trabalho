@@ -59,7 +59,7 @@ class ResenhaController extends Controller
      */
     public function show($id)
     {
-        $resenha = Resenha::with(['user', 'livro.autores', 'livro.editora'])
+        $resenha = Resenha::with(['user', 'livro.autores', 'livro.editora', 'comments.user'])
             ->findOrFail($id);
 
         return view('resenhas.show', compact('resenha'));

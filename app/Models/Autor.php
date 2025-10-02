@@ -10,6 +10,9 @@ class Autor extends Model
 {
     use HasFactory;
 
+    // Força o nome correto da tabela (Laravel tentaria 'autors')
+    protected $table = 'autores';
+
     protected $fillable = ['nome', 'biografia', 'codigo'];
 
     public function livros(): BelongsToMany

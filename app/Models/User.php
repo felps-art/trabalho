@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Resenha;
+use App\Models\UsuarioLivroStatus;
+use App\Models\Livro;
+use App\Models\ResenhaComment;
 
 class User extends Authenticatable
 {
@@ -17,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'image_profile',
+        'foto_perfil',
         'address',
         'whatsapp',
         'instagram',
@@ -79,5 +83,65 @@ class User extends Authenticatable
     public function likedPosts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'likes', 'user_id', 'post_id')->withTimestamps();
+    }
+
+    /**
+     * Relacionamento: um usuário pode ter muitas resenhas.
+     * Liga com a tabela `resenhas` pela chave estrangeira `user_id`.
+     */
+    public function resenhas(): HasMany
+    {
+        return $this->hasMany(Resenha::class, 'user_id');
+    }
+
+    /**
+     * Todos os registros de status de leitura deste usuário (pivot)
+     */
+    public function livrosStatus(): HasMany
+    {
+        return $this->hasMany(UsuarioLivroStatus::class, 'user_id');
+    }
+
+    /**
+     * Livros marcados como "Quero Ler" (status_leitura_id = 1)
+     */
+    public function livrosQueroLer(): HasMany
+    {
+        return $this->hasMany(UsuarioLivroStatus::class, 'user_id')
+            ->where('status_leitura_id', 1);
+    }
+
+    /**
+     * Livros marcados como "Lendo" (status_leitura_id = 2)
+     */
+    public function livrosLendo(): HasMany
+    {
+        return $this->hasMany(UsuarioLivroStatus::class, 'user_id')
+            ->where('status_leitura_id', 2);
+    }
+
+    /**
+     * Livros marcados como "Lidos" (status_leitura_id = 3)
+     */
+    public function livrosLidos(): HasMany
+    {
+        return $this->hasMany(UsuarioLivroStatus::class, 'user_id')
+            ->where('status_leitura_id', 3);
+    }
+
+    /**
+     * Comentários feitos em resenhas.
+     */
+    public function resenhaComments(): HasMany
+    {
+        return $this->hasMany(ResenhaComment::class, 'user_id');
+    }
+
+    /**
+     * Resenhas que o usuário curtiu.
+     */
+    public function likedResenhas(): BelongsToMany
+    {
+        return $this->belongsToMany(Resenha::class, 'resenha_likes', 'user_id', 'resenha_id')->withTimestamps();
     }
 }

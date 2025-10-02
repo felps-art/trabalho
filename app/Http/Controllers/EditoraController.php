@@ -2,63 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\EditoraRequest;
+use App\Models\Editora;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class EditoraController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        //
+        $editoras = Editora::withCount('livros')->orderBy('nome')->paginate(10);
+        return view('editoras.index', compact('editoras'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('editoras.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(EditoraRequest $request): RedirectResponse
     {
-        //
+        $editora = Editora::create($request->validated());
+        return redirect()->route('editoras.show', $editora)->with('success', 'Editora criada com sucesso.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Editora $editora): View
     {
-        //
+        $editora->load(['livros' => function ($q) { $q->select('id','titulo','editora_id'); }]);
+        return view('editoras.show', compact('editora'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Editora $editora): View
     {
-        //
+        return view('editoras.edit', compact('editora'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(EditoraRequest $request, Editora $editora): RedirectResponse
     {
-        //
+        $editora->update($request->validated());
+        return redirect()->route('editoras.show', $editora)->with('success', 'Editora atualizada com sucesso.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Editora $editora): RedirectResponse
     {
-        //
+        if ($editora->livros()->exists()) {
+            return redirect()->route('editoras.show', $editora)
+                ->with('error', 'Não é possível excluir: há livros associados.');
+        }
+        $editora->delete();
+        return redirect()->route('editoras.index')->with('success', 'Editora excluída com sucesso.');
     }
 }
